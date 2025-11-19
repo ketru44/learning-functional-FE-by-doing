@@ -14,4 +14,15 @@ export function runEntireRace(arrOfCarNames, cntOfLaps, randomTape) {
   return raceHistoryByLap;
 };
 
-
+export function runSingleLap(prevState, raceResultNumber) {
+  const currentScore = prevState.scores;
+  const nextScores = currentScore.map((prevScore, idx) => {
+    const raceResult = raceResultNumber[idx];
+    if(meetMoveCondition(raceResult)) return prevScore + 1;
+    return prevScore
+  })
+  return {
+    currentLap: prevState.currentLap + 1,
+    scores: nextScores,
+  };
+}

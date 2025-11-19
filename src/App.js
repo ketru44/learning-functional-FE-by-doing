@@ -1,6 +1,6 @@
 import { MissionUtils } from "@woowacourse/mission-utils";
 import { parseByComma, parseToHistoryFormat, parserToWinnerFormat } from "./utils/parsing";
-import { runEntireRace } from "./domains/race";
+import { runSingleLap } from "./domains/race";
 import { determineWinnerOfRace } from "./domains/queries";
 import { validateCarNameRule, validateLapNumberRule } from "./utils/validator";
 import { useStateContainer } from "./fp_core/state";
@@ -16,20 +16,32 @@ class App {
     validateLapNumberRule(totalLaps);
 
     const [getRaceState, setRaceState] = useStateContainer({ // 상태 보관
-      carNames,
-      totalLaps,
       currentLap: 0,
       scores: Array(carNames.length).fill(0),
     });
-
     const raceState = getRaceState();
+    const historyOfRace = [[...raceState.scores]]; // score 상태의 스냅샷을 기록
+    const carCount = carNames.length;
 
     // 레이스 진행
-    const randomNumberTape = this.makeRandomNumbersTape(raceState.carNames, raceState.totalLaps);
-    const historyOfRace = runEntireRace(raceState.carNames, raceState.totalLaps, randomNumberTape);
-    const namesOfWinner = determineWinnerOfRace(raceState.carNames, historyOfRace[historyOfRace.length -1]);
+    const randomNumberTape = this.makeRandomNumbersTape(carNames, totalLaps);
+    for(let lp = 0 ; lp < totalLaps ; lp++ ) {
+      const offset = lp * carCount;
+      const randomNumbersForLap = randomNumberTape.slice(
+        offset,
+        offset + carCount
+      );
+
+      setRaceState(prev => runSingleLap(prev, randomNumbersForLap));
+
+      const { scores } = getRaceState();
+      historyOfRace.push([...scores]);
+    }
+    console.log(historyOfRace);
+    const finalScoreState = getRaceState().scores;
+    const namesOfWinner = determineWinnerOfRace(carNames, finalScoreState);
     // 결과 출력(레이스 히스토리, 우승자)
-    this.printHistoryOfRace(historyOfRace, raceState.carNames);
+    this.printHistoryOfRace(historyOfRace, carNames);
     this.printWinnerOfRace(namesOfWinner);
   }
   
