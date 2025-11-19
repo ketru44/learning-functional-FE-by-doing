@@ -3,22 +3,33 @@ import { parseByComma, parseToHistoryFormat, parserToWinnerFormat } from "./util
 import { runEntireRace } from "./domains/race";
 import { determineWinnerOfRace } from "./domains/queries";
 import { validateCarNameRule, validateLapNumberRule } from "./utils/validator";
+import { useStateContainer } from "./fp_core/state";
 
 class App {
   async run() {
     // 입력(자동차명, 횟수)
-    const stringOfCarNamesUserRequest = await this.readInputAsyncUsingWoowaMissionApi("경주할 자동차 이름을 입력하세요.(이름은 쉼표(,) 기준으로 구분)");
-    const arrayOfCarNamesUserRequest = parseByComma(stringOfCarNamesUserRequest);
-    validateCarNameRule(arrayOfCarNamesUserRequest);  
-    const stringOfLapUserRequest = await this.readInputAsyncUsingWoowaMissionApi("시도할 횟수는 몇 회인가요?");
-    const countOfLapUserRequest = Number(stringOfLapUserRequest);
-    validateLapNumberRule(countOfLapUserRequest);
+    const rawCarNamesUserRequest = await this.readInputAsyncUsingWoowaMissionApi("경주할 자동차 이름을 입력하세요.(이름은 쉼표(,) 기준으로 구분)");
+    const carNames = parseByComma(rawCarNamesUserRequest);
+    validateCarNameRule(carNames);  
+    const rawLapUserRequest = await this.readInputAsyncUsingWoowaMissionApi("시도할 횟수는 몇 회인가요?");
+    const totalLaps = Number(rawLapUserRequest);
+    validateLapNumberRule(totalLaps);
+
+    const [getRaceState, setRaceState] = useStateContainer({ // 상태 보관
+      carNames,
+      totalLaps,
+      currentLap: 0,
+      scores: Array(carNames.length).fill(0),
+    });
+
+    const raceState = getRaceState();
+
     // 레이스 진행
-    const randomNumberTape = this.makeRandomNumbersTape(arrayOfCarNamesUserRequest, countOfLapUserRequest);
-    const historyOfRace = runEntireRace(arrayOfCarNamesUserRequest, countOfLapUserRequest, randomNumberTape);
-    const namesOfWinner = determineWinnerOfRace(arrayOfCarNamesUserRequest, historyOfRace[historyOfRace.length -1]);
+    const randomNumberTape = this.makeRandomNumbersTape(raceState.carNames, raceState.totalLaps);
+    const historyOfRace = runEntireRace(raceState.carNames, raceState.totalLaps, randomNumberTape);
+    const namesOfWinner = determineWinnerOfRace(raceState.carNames, historyOfRace[historyOfRace.length -1]);
     // 결과 출력(레이스 히스토리, 우승자)
-    this.printHistoryOfRace(historyOfRace, arrayOfCarNamesUserRequest);
+    this.printHistoryOfRace(historyOfRace, raceState.carNames);
     this.printWinnerOfRace(namesOfWinner);
   }
   

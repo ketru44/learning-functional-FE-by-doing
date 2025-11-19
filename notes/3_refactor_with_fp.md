@@ -21,4 +21,17 @@ export function useStateContainer(initialState) {
   - 컨테이너를 사용한다고 해서 불변성이 보장되는 것이 아닙니다. 목적은 상태 교체 방식을 강제하기 때문에 "새로운 객체나 배열을 만들어서 setState"로 변경한다라는 불변성을 유지하는데에 도움이 됩니다.
 
 불변 데이터 적용하기
+  - 컨테이너를 사용하여 레이스에 사용되는 상태들을 분리하고, 데이터들이 불변성을 유지할 수 있도록 리팩토링 해보겠습니다. (이렇게 보니 상태들의 변경을 추적하는 기능에 대해서도 생각해보아야 할 것 같네요)
+  - 사용하는 데이터 중 상태가 `변하거나 추후 변할 가능성`이 있는 것만 모아 객체로 만들어 보겠습니다.
+    - 입력값(자동차명, 라운드 수)
+    - 현재 라운드
+    - 레이스 히스토리
+    ```js
+    const [getRaceState, setRaceState] = useStateContainer({ // 상태 보관
+      carNames,
+      totalLaps,
+      currentLap: 0,
+      scores: Array(carNames.length).fill(0),
+    });
+    ```
 
