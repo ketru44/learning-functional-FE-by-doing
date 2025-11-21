@@ -48,9 +48,9 @@ describe("자동차 경주", () => {
   test.each(([
     [["a", "b", "c"], 4, 12],
     [["a", "b", "c", "d"], 1, 4]
-  ]))("필요한 만큼(차량 수 * 랩 수)의 난수 테이프 생성", (cars, laps, expected) => {
+  ]))("필요한 만큼(차량 수 * 랩 수)의 난수 테이프 생성", async (cars, laps, expected) => {
     const app = new App();
-    const randomNumberTape = app.makeRandomNumbersTape(cars, laps);
+    const randomNumberTape = await app.makeRandomNumbersTape(cars, laps);
     expect(randomNumberTape.length).toBe(expected); // cars.length * laps
   });
   test("예외 테스트", async () => {

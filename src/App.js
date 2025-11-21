@@ -4,14 +4,21 @@ import { runSingleLap } from "./domains/race";
 import { determineWinnerOfRace } from "./domains/queries";
 import { validateCarNameRule, validateLapNumberRule } from "./utils/validator";
 import { useStateContainer } from "./fp_core/state";
+import { createReadLineEffect, createPrintEffect, createRandomNumberInRangeEffect } from "./fp_core/effectData";
+import { runEffect } from "./fp_core/effectRunner";
 
 class App {
   async run() {
     // 입력(자동차명, 횟수)
-    const rawCarNamesUserRequest = await this.readInputAsyncUsingWoowaMissionApi("경주할 자동차 이름을 입력하세요.(이름은 쉼표(,) 기준으로 구분)");
+    const rawCarNamesUserRequest = await runEffect(
+      createReadLineEffect("경주할 자동차 이름을 입력하세요.(이름은 쉼표(,) 기준으로 구분)")
+    );
     const carNames = parseByComma(rawCarNamesUserRequest);
-    validateCarNameRule(carNames);  
-    const rawLapUserRequest = await this.readInputAsyncUsingWoowaMissionApi("시도할 횟수는 몇 회인가요?");
+    validateCarNameRule(carNames);
+
+    const rawLapUserRequest = await runEffect(
+      createReadLineEffect("시도할 횟수는 몇 회인가요?")
+    );
     const totalLaps = Number(rawLapUserRequest);
     validateLapNumberRule(totalLaps);
 
@@ -21,10 +28,10 @@ class App {
     });
     const raceState = getRaceState();
     const historyOfRace = [[...raceState.scores]]; // score 상태의 스냅샷을 기록
-    const carCount = carNames.length;
 
+    const carCount = carNames.length;
     // 레이스 진행
-    const randomNumberTape = this.makeRandomNumbersTape(carNames, totalLaps);
+    const randomNumberTape = await this.makeRandomNumbersTape(carNames, totalLaps);
     for(let lp = 0 ; lp < totalLaps ; lp++ ) {
       const offset = lp * carCount;
       const randomNumbersForLap = randomNumberTape.slice(
@@ -37,22 +44,31 @@ class App {
       const { scores } = getRaceState();
       historyOfRace.push([...scores]);
     }
-    console.log(historyOfRace);
     const finalScoreState = getRaceState().scores;
     const namesOfWinner = determineWinnerOfRace(carNames, finalScoreState);
     // 결과 출력(레이스 히스토리, 우승자)
-    this.printHistoryOfRace(historyOfRace, carNames);
-    this.printWinnerOfRace(namesOfWinner);
+    // this.printHistoryOfRace(historyOfRace, carNames);
+    // this.printWinnerOfRace(namesOfWinner);
+    historyOfRace.forEach((log) => {
+      const msg = parseToHistoryFormat(log, carNames);
+      runEffect(createPrintEffect(msg));
+    });
+
+    runEffect(createPrintEffect(parserToWinnerFormat(namesOfWinner)));
+
   }
   
   async readInputAsyncUsingWoowaMissionApi(questionStr) {
     return await MissionUtils.Console.readLineAsync(questionStr);
   }
-  makeRandomNumbersTape(cars, laps) { // 부수효과를 없애기 위해 필요한 만큼의 난수를 만들고 레이스 진행
+  async makeRandomNumbersTape(cars, laps) { // 부수효과를 없애기 위해 필요한 만큼의 난수를 만들고 레이스 진행
     let numberTape = [];
     const countOfNeededNumber = cars.length * laps;
     for(let cnt = 0; cnt < countOfNeededNumber; cnt++) {
-      numberTape.push(this.pickRandomNumberInRangeUsingWoowaMissionApi(0, 9))
+      const random = await runEffect(
+        createRandomNumberInRangeEffect(0, 9)
+      )
+      numberTape.push(random);
     }
     return numberTape;
   } 
@@ -64,11 +80,15 @@ class App {
   }
   printHistoryOfRace(history, name) {
     history.forEach(log => {
-      this.printOutputUsingWoowaMissionApi(parseToHistoryFormat(log, name))
+      runEffect(
+        createPrintEffect((parseToHistoryFormat(log, name)))
+      )
     })
   }
   printWinnerOfRace(winner) {
-    this.printOutputUsingWoowaMissionApi(parserToWinnerFormat(winner));
+    runEffect(
+      createPrintEffect((parserToWinnerFormat(winner)))
+    );
   }
 };
 export default App;

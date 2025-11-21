@@ -34,8 +34,6 @@ export function useStateContainer(initialState) {
     - 스코어
     ```js
     const [getRaceState, setRaceState] = useStateContainer({ // 상태 보관
-      carNames,
-      totalLaps,
       currentLap: 0,
       scores: Array(carNames.length).fill(0),
     });
@@ -44,6 +42,46 @@ export function useStateContainer(initialState) {
     ```js
     const historyOfRace = runEntireRace(raceState.carNames, raceState.totalLaps, randomNumberTape);
     ```
-    runEntireRace 안에서 새로운 상태를 만들고 라운드를 진행하게 됩니다. setState를 활용하기 위해서 코드 구조를 변경하려고 합니다.
+    runEntireRace 안에서 새로운 상태를 만들고 라운드를 진행하게 됩니다. setState를 활용하기 위해서 코드 구조를 변경했습니다.
+
+### 순수함수 리팩토링
+
+runEffect
+- 기본적으로 미션을 시작할 때 입력, 출력, 랜덤 생성과 같은 액션을 분리하여 순수함수로 구현해보자는 틀을 만들었기 때문에 현재 함수들이 순수함수로 잘 구현되어 있습니다. 액션을 분리하면서 어디에 두어야 할 지 고민이 되었습니다. 계산에 영향을 주지 않기 위해 최상단인 app.run()에 자연스레 몰아 넣게 되었죠. 그래서 명시적으로 부수효과들을 분리하여 모아두면 좋겠다는 생각을 하게 되었습니다. 
+- 그리고 모아두는 것 뿐 아니라 `액션을 데이터로 추상화`해서 액션을 더욱더 경계에 몰아두려고 합니다. App.run()에서 Mission 유틸을 직접 호출하지 않도록 액션을 `설명하는 데이터`로 바꿔 보겠습니다.
+  ```js
+    export function createReadLineEffect(questionStr) {
+      return {
+        type: "readline",
+        questionStr,
+      }
+    };
+    export function createPrintEffect(printStr) {
+      return {
+        type: "print",
+        printStr,
+      }
+    };
+    export function createRandomNumberInRangeEffect(min, max) {
+      return {
+        type: "random_single",
+        min,
+        max,
+      }
+    }
+  ```
+- 이렇게 만들어진 객체는 액션이 아니라 `액션을 요청하기 위한 데이터`가 됩니다. 그리고 이 데이터를 읽고 runEffect에서 액션을 모아 수행함으로써 도메인 로직(액션)가 강하게 분리됩니다. 결과적으로 액션이 일어나는 곳은 runEffect로 제한하여 관리할 수 있게 됩니다.
+  ```js
+  export async function runEffect(effect) {
+    if(effect.type === "readline")  
+      return await MissionUtils.Console.readLineAsync(effect.questionStr);
+    if(effect.type === "print")
+      return MissionUtils.Console.print(effect.printStr);
+    if(effect.type === "random_single")
+      return MissionUtils.Random.pickNumberInRange(effect.min, effect.max);
+  
+    throw new Error(`존재하지 않는 effect입니다. (${effect.type})`);
+  };
+  ```
 
 
