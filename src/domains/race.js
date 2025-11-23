@@ -22,6 +22,7 @@ export function runSingleLap(prevState, raceResultNumber) {
     return prevScore
   })
   return {
+    ...prevState,
     currentLap: prevState.currentLap + 1,
     scores: nextScores,
   };

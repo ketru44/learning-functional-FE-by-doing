@@ -1,4 +1,4 @@
-import { useStateContainer } from "../src/fp_core/state";
+import { useStateContainer } from "../src/fp_core/useStateContainer/state";
 
 describe("useState 연습 테스트", () => {
   test("문자열 데이터 container 테스트", () => {
