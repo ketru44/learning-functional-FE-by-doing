@@ -1,8 +1,51 @@
-# 프로젝트 개요
+# 함수형 패러다임 이해하기
+## 프로젝트 개요
 이 프로젝트는 `함수형 패러다임이 웹 개발이라는 환경에서 어떻게 활용되는가`와 `함수형 사고를 중심으로 프리코스를 진행하면서 겪었던 문제`에 대한 개인적인 탐구입니다.
 
 지난 3주 동안 정해진 프리코스 미션을 수행하며 함수형 패러다임을 일부 적용해보았습니다. 하지만 현대 웹은 본질적으로 비동기 이벤트, 상태, DOM 조작과 같은 부수효과 없인 존재할 수 없습니다. 이 둘은 섞일 수 없는 개념들처럼 보입니다. 어떻게 FP가 `프론트엔드 개발에 필요한 이유`와 `적용되고 있는 방식`에 대해서 알아봅니다.
 
-이러한 개념들을 바탕으로 'learning by doing'을 통해서 useState와 useEffect와 같은 개념들을 직접 구현해보며 프리코스를 진행하면서 겪었던 어려움들을 해결해보려고 합니다.
+이러한 개념들을 바탕으로 'learning by doing'을 통해서 직접 구현해보며 프리코스를 진행하면서 겪었던 함수형 패러다임에 대한 궁금증들을 해결해보려고 합니다.
 
-# 차례
+## 목표
+
+## 차례
+- 1. [FP_or_Web](./notes/1_FP_or_Web.md)
+- 2. [FP_and_Web](./notes/2_FP_and_Web.md)
+- 3. [refactor_with_fp](./notes/3_refactor_with_fp.md)
+  - src/fp_core
+
+## 리팩토링 포인트
+### 1. `useStateContainer` - 상태를 한 곳으로 모으기
+### 2. `runEffect` - 액션을 추상화
+### 3. `store + raceReducer` - 상태 변경
+
+## 폴더 구조
+```txt
+src/
+  App.js
+  domains/
+    queries.js
+    race.js
+  fp_core/
+    useStateContainer/
+      state.js
+    effect/
+      effectData.js
+      effectRunner.js
+    customRedux/
+      store.js
+      raceReducer.js
+```
+## 실행 방법
+```bash
+# 설치
+npm install
+
+# 실행
+npm start 
+  # 또는
+npm src/index.js
+
+# 테스트
+npm test
+```
