@@ -1,4 +1,7 @@
 # 함수형 패러다임 이해하기
+![mfpa](https://github.com/user-attachments/assets/6c5b0522-4985-4b4e-b45d-199fb7315ae1)
+(출처-https://medium.com/@taljoffe/functional-programming-with-react-redux-6228906edbe3)
+
 ## 프로젝트 개요
 이 프로젝트는 `함수형 패러다임이 웹 개발이라는 환경에서 어떻게 활용되는가`와 `함수형 사고를 중심으로 프리코스를 진행하면서 겪었던 문제`에 대한 개인적인 탐구입니다.
 
