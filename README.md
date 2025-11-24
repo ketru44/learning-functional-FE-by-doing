@@ -57,5 +57,6 @@ npm test
 ### 참고 자료
 https://alfy.blog/2025/10/04/how-functional-programming-shaped-modern-frontend.html
 https://ko.react.dev/
+https://medium.com/@taljoffe/functional-programming-with-react-redux-6228906edbe3
 https://github.com/reduxjs/redux
 https://pitayan.com/posts/redux-fp-design/
