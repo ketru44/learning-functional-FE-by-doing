@@ -113,7 +113,7 @@ export function createStore(reducer, initialState) {
 }
 ```
 
-레이싱 게임에서는 라운드 상태를 출력하는 기능이 구독자가 되어서 상태를 변경합니다.
+레이싱 게임에서는 '라운드 상태를 출력하는 로직'이 구독자가 되도록 하였습니다.
 ```js
 store.dispatch(raceOneLap(randomNumbersForLap)); // 한 라운드 진행
 ```
@@ -131,6 +131,23 @@ export function raceReducer(state, action) {
   return state;
 }
 ```
+#### 리렌더링 느낌내기
+구독자와 dispatch를 활용하여, 간단하지만 React의 리렌더링 느낌도 흉내 내보았습니다.
+```js
+    store.subscribe(() => {
+      const state = store.getState();
+      if (state.currentLap > 0) {
+        const line = parseToHistoryFormat(state.scores, state.carNames);
+        runEffect(createPrintEffect(line));
+      }
+    });
+
+    ...
+
+    store.dispatch(raceOneLap(randomNumbersForLap));
+```
+히스토리 배열을 두지 않고 상태가 바뀔 때마다 구독자(라운드 진행 로직)이 호출되어 그 시점에 상태를 출력합니다.
+
 
 ### 정리
 리팩토링의 목적은

@@ -1,13 +1,13 @@
 import { MissionUtils } from "@woowacourse/mission-utils";
-import { parseByComma, parseToHistoryFormat, parserToWinnerFormat } from "./utils/parsing";
-import { runSingleLap } from "./domains/race";
-import { determineWinnerOfRace } from "./domains/queries";
-import { validateCarNameRule, validateLapNumberRule } from "./utils/validator";
-import { useStateContainer } from "./fp_core/useStateContainer/state";
-import { createReadLineEffect, createPrintEffect, createRandomNumberInRangeEffect } from "./fp_core/effect/effectData";
-import { runEffect } from "./fp_core/effect/effectRunner";
-import { createStore } from "./fp_core/customRedux/store";
-import { raceReducer, raceInit, raceOneLap } from "./fp_core/customRedux/raceReducer";
+import { parseByComma, parseToHistoryFormat, parserToWinnerFormat } from "./utils/parsing.js";
+import { determineWinnerOfRace } from "./domains/queries.js";
+import { validateCarNameRule, validateLapNumberRule } from "./utils/validator.js";
+import { runSingleLap } from "./domains/race.js";
+import { useStateContainer } from "./fp_core/useStateContainer/state.js";
+import { createReadLineEffect, createPrintEffect, createRandomNumberInRangeEffect } from "./fp_core/effect/effectData.js";
+import { runEffect } from "./fp_core/effect/effectRunner.js";
+import { createStore } from "./fp_core/customRedux/store.js";
+import { raceReducer, raceInit, raceOneLap } from "./fp_core/customRedux/raceReducer.js";
 
 class App {
   async run() {
@@ -57,7 +57,18 @@ class App {
 
     // runEffect(createPrintEffect(parserToWinnerFormat(namesOfWinner)));
 
-    const store = createStore(raceReducer, {});
+    // store + reducer 사용 버전
+    const store = createStore(raceReducer, {}); // store 생성
+
+    // 상태가 변할 때마다 라운드 결과를 출력하도록 구독
+    store.subscribe(() => {
+      const state = store.getState();
+      if (state.currentLap > 0) {
+        const line = parseToHistoryFormat(state.scores, state.carNames);
+        runEffect(createPrintEffect(line));
+      }
+    });
+
     store.dispatch(raceInit(carNames, totalLaps));
     const stateAfterInit = store.getState();
     const carCount = stateAfterInit.carNames.length;
@@ -68,15 +79,11 @@ class App {
     );
 
     // 라운드 진행 + 매 라운드마다 출력
-    for (let lap = 0; lap < stateAfterInit.totalLaps; lap++) {
+    for (let lap = 0; lap < totalLaps; lap++) {
       const offset = lap * carCount;
       const randomNumbersForLap = randomNumberTape.slice(offset, offset + carCount);
-
-      store.dispatch(raceOneLap(randomNumbersForLap)); // 한 라운드 진행
-
-      const state = store.getState(); // 최신 상태
-      const line = parseToHistoryFormat(state.scores, state.carNames);
-      await runEffect(createPrintEffect(line)); 
+      store.dispatch(raceOneLap(randomNumbersForLap));
+      // => 여기서 dispatch가 호출되면, subscribe 콜백이 불려 그 시점의 scores를 기반으로 한 줄 출력
     }
 
     const finalState = store.getState();
@@ -104,6 +111,7 @@ class App {
     }
     return numberTape;
   } 
+
   pickRandomNumberInRangeUsingWoowaMissionApi(min, max) {
     return MissionUtils.Random.pickNumberInRange(min, max);
   }
