@@ -7,6 +7,7 @@
 이러한 개념들을 바탕으로 'learning by doing'을 통해서 직접 구현해보며 프리코스를 진행하면서 겪었던 함수형 패러다임에 대한 궁금증들을 해결해보려고 합니다.
 
 ## 목표
+`부수효과로 가득한 웹 환경에서 어떻게 그리고 왜 함수형 패러다임이 적용되고 있는지 이해해 봅니다.`
 
 ## 차례
 - 1. [FP_or_Web](./notes/1_FP_or_Web.md)
@@ -56,7 +57,11 @@ npm test
 
 ### 참고 자료
 https://alfy.blog/2025/10/04/how-functional-programming-shaped-modern-frontend.html
+
 https://ko.react.dev/
+
 https://medium.com/@taljoffe/functional-programming-with-react-redux-6228906edbe3
+
 https://github.com/reduxjs/redux
+
 https://pitayan.com/posts/redux-fp-design/
