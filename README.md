@@ -13,6 +13,7 @@
 - 2. [FP_and_Web](./notes/2_FP_and_Web.md)
 - 3. [refactor_with_fp](./notes/3_refactor_with_fp.md)
   - src/fp_core
+- 4. [conclusion](./notes/4_conclusion.md)
 
 ## 리팩토링 포인트
 ### 1. `useStateContainer` - 상태를 한 곳으로 모으기
