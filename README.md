@@ -53,3 +53,9 @@ npm src/index.js
 # 테스트
 npm test
 ```
+
+### 참고 자료
+https://alfy.blog/2025/10/04/how-functional-programming-shaped-modern-frontend.html
+https://ko.react.dev/
+https://github.com/reduxjs/redux
+https://pitayan.com/posts/redux-fp-design/
