@@ -1,4 +1,4 @@
-import { runSingleLap } from "../../domains/race";
+import { runSingleLap } from "../../domains/race.js";
 
 const RACE_INIT = "RACE_INIT";
 const RACE_ONE_LAP = "RACE_ONE_LAP";
@@ -15,7 +15,7 @@ export function raceReducer(state, action) {
   };
   if(action.type === RACE_ONE_LAP) {
     const { randomNumbersForLap } = action.payload;
-    
+
     return runSingleLap(state, randomNumbersForLap);
   };
   return state;
